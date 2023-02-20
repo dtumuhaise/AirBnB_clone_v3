@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-""" route /status on the
+"""route /status on the
 object app_views that returns a JSON: “status”: “OK”
 """
 
