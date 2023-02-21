@@ -9,7 +9,7 @@ from models.place import Place
 from models.city import City
 
 
-@app_views.route('/api/v1/cities/<city_id>/places', methods=['GET'])
+@app_views.route('/cities/<city_id>/places', methods=['GET'])
 def get_places(city_id):
     """ retrieves list of all places """
     city = storage.get(City, city_id)
@@ -17,3 +17,59 @@ def get_places(city_id):
         abort(404)
     place = city.places
     return jsonify([place.to_dict() for place in places])
+
+
+@app_views.route('/places/<place_id>', methods=['GET'])
+def get_place(place_id):
+    """ retrieves a place object """
+    place = storage.get(Place, place_id)
+    if place is none:
+        abort(404)
+    return jsonify(place.to_dict())
+
+
+@app_views.route('/places/<place_id>', methods=['DELETE'])
+def delete_place(place_id):
+    """ deletes a place object """
+    place = storage.get(Place, place_id)
+    if place_id not in place:
+        abort(404)
+    storage.delete(place)
+    storage.save()
+    return jsonify({}), 200
+
+
+@app_views.route('/cities/<city_id>/places', methods=['POST'])
+def create_place(city_id):
+    """create a place"""
+    city = storage.get(City, city_id)
+    if city is None:
+        abort(404)
+    data = request.get_json()
+    if data is None:
+        abort(404, 'Not a JSON')
+    if 'user_id' not in data:
+        abort(400, 'Missing user_id')
+    if 'name' not in data:
+        abort(400, 'Missing name')
+    user = storage.get(User, user_id)
+    if user_id not in user:
+        abort(404)
+    return jsonify(place.to_dict()), 201
+
+
+@app_views.route('/places/<place_id>', methods=['PUT'])
+def update_place(place_id):
+    """updates a place"""
+    place = storage.get(Place, place_id)
+    if place is None:
+        abort(404)
+    data = request.get_json()
+    if data is None:
+        abort(404, 'Not a JSON')
+    ignore = ['id', 'user_id', 'city_id', 'created_at', 'updated_at']
+    for key, value in data.items():
+        if key not in ignore:
+            setattr(place, key, value)
+    storage.save()
+    return jsonify(place.to_dict()), 200
