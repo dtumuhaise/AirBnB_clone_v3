@@ -7,6 +7,7 @@ from flask import jsonify, abort, request
 from models import storage
 from models.place import Place
 from models.city import City
+from models.user import User
 
 
 @app_views.route('/cities/<city_id>/places', methods=['GET'])
@@ -15,7 +16,7 @@ def get_places(city_id):
     city = storage.get(City, city_id)
     if city is None:
         abort(404)
-    place = city.places
+    places = city.places
     return jsonify([place.to_dict() for place in places])
 
 
@@ -23,7 +24,7 @@ def get_places(city_id):
 def get_place(place_id):
     """ retrieves a place object """
     place = storage.get(Place, place_id)
-    if place is none:
+    if place is None:
         abort(404)
     return jsonify(place.to_dict())
 
@@ -53,7 +54,7 @@ def create_place(city_id):
     if 'name' not in data:
         abort(400, 'Missing name')
     user = storage.get(User, user_id)
-    if user_id not in user:
+    if user is None:
         abort(404)
     return jsonify(place.to_dict()), 201
 
